@@ -1,0 +1,13 @@
+{
+  "name": "haxball-headless-replit",
+  "version": "1.0.0",
+  "description": "Headless Haxball server on Replit with classic maps",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "puppeteer": "^20.0.0",
+    "dotenv": "^16.0.0"
+  }
+}
