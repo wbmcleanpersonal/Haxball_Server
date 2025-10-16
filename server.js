@@ -1,13 +1,26 @@
 const puppeteer = require("puppeteer");
+const fs = require("fs");
+const stripJsonComments = require("strip-json-comments").default || require("strip-json-comments");
 require("dotenv").config();
+
+// Helper function to load JSON with comments
+function loadMapJSON(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, "utf8");
+    // Strip comments safely (respects strings and quoted content)
+    const cleanedContent = stripJsonComments(content);
+    return JSON.parse(cleanedContent);
+  } catch (error) {
+    console.error(`Error loading map from ${filePath}:`, error.message);
+    throw new Error(`Failed to parse map file ${filePath}: ${error.message}`);
+  }
+}
 
 // Load maps
 const maps = {
-  classic: require("./maps/1v1.json"),
-  big: require("./maps/4v4.json"),
-  small: require("./maps/3v3.json"),
-  easy: require("./maps/easy.json"),
-  hardcourt: require("./maps/hardcourt.json")
+  classic: loadMapJSON("./maps/1v1.json"),
+  big: loadMapJSON("./maps/4v4.json"),
+  small: loadMapJSON("./maps/3v3.json")
 };
 
 const TOKEN = process.env.HAXBALL_TOKEN;
@@ -25,7 +38,10 @@ async function launchHeadlessHost() {
   });
   const page = await browser.newPage();
 
-  await page.goto("https://www.haxball.com/headless");
+  await page.goto("https://www.haxball.com/headless", { waitUntil: "networkidle2" });
+
+  // Wait for HBInit to be available
+  await page.waitForFunction("typeof HBInit !== 'undefined'", { timeout: 30000 });
 
   await page.evaluate(
     ({ token, roomName, maps }) => {
@@ -49,7 +65,7 @@ async function launchHeadlessHost() {
         console.log("Goal for team:", team);
       };
 
-      console.log("Room created:", room.getRoomData());
+      console.log("Room created successfully!");
     },
     { token: TOKEN, roomName: ROOM_NAME, maps }
   );
