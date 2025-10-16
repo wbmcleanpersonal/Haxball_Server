@@ -3,9 +3,9 @@ require("dotenv").config();
 
 // Load maps
 const maps = {
-  classic: require("./maps/classic.json"),
-  big: require("./maps/big.json"),
-  small: require("./maps/small.json"),
+  classic: require("./maps/1v1.json"),
+  big: require("./maps/4v4.json"),
+  small: require("./maps/3v3.json"),
   easy: require("./maps/easy.json"),
   hardcourt: require("./maps/hardcourt.json")
 };
